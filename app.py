@@ -36,4 +36,5 @@ def submit():
     return jsonify({"message": "Usuario creado con éxito"}), 201
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
