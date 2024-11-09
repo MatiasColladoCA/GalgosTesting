@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect, url_for
+
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -33,7 +34,7 @@ def submit():
     db.session.add(nuevo_usuario)
     db.session.commit()
     
-    return jsonify({"message": "Usuario creado con éxito"}), 201
+    return render_template('success.html')
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
