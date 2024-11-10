@@ -1,9 +1,10 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, url_for
 
 from flask_sqlalchemy import SQLAlchemy
 import os
 
-app = Flask(__name__)
+root_dir = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, template_folder=root_dir))
 
 # Configuración de la base de datos PostgreSQL
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
@@ -21,35 +22,22 @@ class Usuario(db.Model):
 # Ruta principal para mostrar el formulario
 @app.route('/')
 def index():
-    return render_template('/index.html')
+    return render_template('index.html')
 
 # Ruta para procesar los datos del formulario
 @app.route('/submit', methods=['POST'])
 def submit():
-    try:
-        nombre = request.form.get('nombre')
-        apellido = request.form.get('apellido')
-        email = request.form.get('email')  # Cambiado de 'mail' a 'email' para coincidir con el modelo
+    nombre = request.form.get('nombre')
+    apellido = request.form.get('apellido')
+    email = request.form.get('email')
 
-        # Validación básica
-        if not all([nombre, apellido, email]):
-            return render_template('/index.html', error="Todos los campos son obligatorios")
-
-        # Verificar si el email ya existe
-        usuario_existente = Usuario.query.filter_by(email=email).first()
-        if usuario_existente:
-            return render_template('/index.html', error="El email ya está registrado")
-
-        # Guardar datos en la base de datos
-        nuevo_usuario = Usuario(nombre=nombre, apellido=apellido, email=email)
-        db.session.add(nuevo_usuario)
-        db.session.commit()
-        
-        return render_template('/templates/success.html')
+    # Guardar datos en la base de datos
+    nuevo_usuario = Usuario(nombre=nombre, apellido=apellido, email=email)
+    db.session.add(nuevo_usuario)
+    db.session.commit()
     
-    except Exception as e:
-        db.session.rollback()
-        return render_template('/index.html', error=f"Error: {str(e)}")
+    return send_from_directory(root_dir, 'success.html')
+
 
 if __name__ == '__main__':
     with app.app_context():
