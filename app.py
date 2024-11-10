@@ -21,7 +21,7 @@ class Usuario(db.Model):
 # Ruta principal para mostrar el formulario
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('/index.html')
 
 # Ruta para procesar los datos del formulario
 @app.route('/submit', methods=['POST'])
@@ -33,23 +33,23 @@ def submit():
 
         # Validación básica
         if not all([nombre, apellido, email]):
-            return render_template('index.html', error="Todos los campos son obligatorios")
+            return render_template('/index.html', error="Todos los campos son obligatorios")
 
         # Verificar si el email ya existe
         usuario_existente = Usuario.query.filter_by(email=email).first()
         if usuario_existente:
-            return render_template('index.html', error="El email ya está registrado")
+            return render_template('/index.html', error="El email ya está registrado")
 
         # Guardar datos en la base de datos
         nuevo_usuario = Usuario(nombre=nombre, apellido=apellido, email=email)
         db.session.add(nuevo_usuario)
         db.session.commit()
         
-        return render_template('success.html')
+        return render_template('/templates/success.html')
     
     except Exception as e:
         db.session.rollback()
-        return render_template('index.html', error=f"Error: {str(e)}")
+        return render_template('/index.html', error=f"Error: {str(e)}")
 
 if __name__ == '__main__':
     with app.app_context():
