@@ -19,7 +19,7 @@ class Usuario(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
 
 # Ruta principal para mostrar el formulario
-@app.route('/')
+@app.route('/templates/')
 def index():
     return render_template('index.html')
 
@@ -55,4 +55,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     port = int(os.getenv('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
