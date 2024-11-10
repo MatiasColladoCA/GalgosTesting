@@ -19,7 +19,7 @@ class Usuario(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
 
 # Ruta principal para mostrar el formulario
-@app.route('/templates/')
+@app.route('/')
 def index():
     return render_template('index.html')
 
