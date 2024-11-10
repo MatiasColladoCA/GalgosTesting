@@ -1,9 +1,11 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template, redirect, url_for
+from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 import os
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
-app = Flask(__name__, template_folder=root_dir)
+app = Flask(__name__, template_folder='.')
+CORS(app)  # Esto permite peticiones desde cualquier origen
 
 # Configuración de la base de datos PostgreSQL
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
