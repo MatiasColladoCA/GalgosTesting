@@ -1,21 +1,16 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, send_from_directory
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, jsonify, render_template, send_from_directory
+from pymongo import MongoClient
 import os
 
 app = Flask(__name__, template_folder='.')
 
-# Configuración de la base de datos PostgreSQL
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Configuración de la URI de MongoDB
+MONGODB_URI = "mongodb://atlas-sql-67252c88077cc50840802c62-fugqw.a.query.mongodb.net/sample_mflix?ssl=true&authSource=admin"
+client = MongoClient(MONGODB_URI)
 
-db = SQLAlchemy(app)
-
-# Modelo de la tabla usuario
-class Usuario(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), nullable=False)
-    apellido = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+# Selección de la base de datos y colección
+db = client['sample_mflix']  # Cambia 'sample_mflix' al nombre de tu base de datos si es diferente
+usuarios_collection = db['usuarios']  # Puedes cambiar 'usuarios' al nombre que desees para la colección
 
 # Ruta principal para mostrar el formulario
 @app.route('/')
@@ -29,16 +24,16 @@ def submit():
     apellido = request.form.get('apellido')
     email = request.form.get('email')
 
-    # Guardar datos en la base de datos
-    nuevo_usuario = Usuario(nombre=nombre, apellido=apellido, email=email)
-    db.session.add(nuevo_usuario)
-    db.session.commit()
+    # Guardar datos en MongoDB
+    nuevo_usuario = {
+        "nombre": nombre,
+        "apellido": apellido,
+        "email": email
+    }
+    usuarios_collection.insert_one(nuevo_usuario)
     
-    return send_from_directory(root_dir, 'success.html')
-
+    return send_from_directory('.', 'success.html')
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     port = int(os.getenv('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
